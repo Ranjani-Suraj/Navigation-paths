@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Maps Example</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBeE0j7ZCad54Ec7Njq9PEwv4qmYqUF2qY&origin=Pittsburg+PA"></script>
+    <style>
+        #map {
+            height: 1400px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Google Maps Example</h1>
+    <div id="map"></div>
+
+    <script>
+        function initMap() {
+            const map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 0, lng: 0 }, // Initial center (change as needed)
+                zoom: 12, // Initial zoom level (change as needed)
+            });
+
+            // Add your current location marker
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const currentLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+
+                    new google.maps.Marker({
+                        position: currentLocation,
+                        map: map,
+                        title: 'Your Location'
+                    });
+
+                    map.setCenter(currentLocation);
+                }, (error) => {
+                    console.error('Error getting current location:', error);
+                });
+            }
+
+            // Add waypoints
+            const waypoints = [
+                { lat: 40.27296440993845, lng: -76.88506554344517 }, // Waypoint 1
+                { lat: 41.24667252773078, lng: -75.8807259047564 } // Waypoint 2
+                // { lat: 40.4529, lng: -79.9338 }, // Waypoint 3
+                // { lat: 40.4319, lng: -80.0248 }  // Waypoint 4
+            ];
+
+            // Create a DirectionsService object
+            const directionsService = new google.maps.DirectionsService();
+
+            // Create a DirectionsRenderer object
+            const directionsRenderer = new google.maps.DirectionsRenderer();
+
+            // Set the map for the DirectionsRenderer
+            directionsRenderer.setMap(map);
+
+            // Define the waypoints
+            const waypointsArray = waypoints.map((waypoint) => ({
+                location: waypoint,
+                stopover: true
+            }));
+
+            // Define the request
+            const request = {
+                origin: currentLocation,
+                destination: 'State College PA', // Replace with the destination address or coordinates
+                waypoints: waypointsArray,
+                travelMode: 'DRIVING'
+            };
+
+            // Use the DirectionsService to get the route
+            directionsService.route(request, (result, status) => {
+                if (status == 'OK') {
+                    // Display the route on the map
+                    directionsRenderer.setDirections(result);
+                } else {
+                    console.error('Error getting directions:', status);
+                }
+            });
+        }
+    </script>
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBeE0j7ZCad54Ec7Njq9PEwv4qmYqUF2qY&callback=initMap"></script>
+</body>
+</html>
